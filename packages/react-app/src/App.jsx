@@ -149,9 +149,6 @@ function App(props) {
   // If you want to bring in the mainnet DAI contract it would look like:
   const mainnetContracts = useContractLoader(mainnetProvider, contractConfig);
 
-  // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
-
   //
   // 🧫 DEBUG 👨🏻‍🔬
   //
@@ -240,11 +237,19 @@ function App(props) {
 
       <Switch>
         <Route exact path="/">
-          <Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />
+          <Home
+            yourLocalBalance={yourLocalBalance}
+            readContracts={readContracts}
+            writeContracts={writeContracts}
+            address={address}
+            tx={tx}
+            blockExplorer={blockExplorer}
+            mainnetProvider={mainnetProvider}
+          />
         </Route>
         <Route exact path="/debug">
           <Contract
-            name="YourContract"
+            name="WolfSheepNFT"
             price={price}
             signer={userSigner}
             provider={localProvider}

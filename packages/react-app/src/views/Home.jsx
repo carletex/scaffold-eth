@@ -1,69 +1,138 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Button, Card, List } from "antd";
 import { useContractReader } from "eth-hooks";
-import { ethers } from "ethers";
+import { Address, AddressInput } from "../components";
 
 /**
- * web3 props can be passed from '../App.jsx' into your local view component for use
+ * web3 props can be passed from '../App.jsx' into your local view component
+ * for use
  * @param {*} yourLocalBalance balance on current network
- * @param {*} readContracts contracts from current chain already pre-loaded using ethers contract module. More here https://docs.ethers.io/v5/api/contract/contract/
+ * @param {*} readContracts contracts from current chain already pre-loaded
+ *   using ethers contract module. More here
+ *   https://docs.ethers.io/v5/api/contract/contract/
+ * @param {*} writeContracts contracts from current chain already pre-loaded
+ *   using ethers contract module. More here
+ *   https://docs.ethers.io/v5/api/contract/contract/
+ * @param {*} address the address of the connected wallet
+ * @param {*} tx The transactor
+ * @param {*} mainnetProvider The mainnetProvider
+ * @param {*} blockExplorer The blockExplorer
  * @returns react component
  */
-function Home({ yourLocalBalance, readContracts }) {
-  // you can also use hooks locally in your component of choice
-  // in this case, let's keep track of 'purpose' variable from our contract
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
+function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, mainnetProvider, blockExplorer }) {
+  const [yourCollectibles, setYourCollectibles] = useState();
+  const [transferToAddresses, setTransferToAddresses] = useState({});
+
+  // keep track of a variable from the contract in the local React state:
+  const totalMinted = useContractReader(readContracts, "WolfSheepNFT", "totalMinted");
+  const balance = useContractReader(readContracts, "WolfSheepNFT", "balanceOf", [address]);
+
+  // keep track of a variable from the contract in the local React state:
+  console.log("🤗 balance:", balance);
+
+  // 🧠 This effect will update yourCollectibles by polling when your balance changes
+  const yourBalance = balance && balance.toString && balance.toString();
+  useEffect(() => {
+    const updateYourCollectibles = async () => {
+      const collectibleUpdate = [];
+      for (let tokenIndex = 0; tokenIndex < balance; tokenIndex++) {
+        try {
+          console.log("Getting token index", tokenIndex);
+          const tokenId = await readContracts.WolfSheepNFT.tokenOfOwnerByIndex(address, tokenIndex);
+          console.log("tokenId", tokenId);
+          const tokenTraits = await readContracts.WolfSheepNFT.getTokenTraits(tokenId);
+          console.log("tokenTraits", tokenTraits);
+
+          collectibleUpdate.push({
+            id: tokenId,
+            owner: address,
+            isSheep: tokenTraits.isSheep,
+          });
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      setYourCollectibles(collectibleUpdate);
+    };
+    updateYourCollectibles();
+  }, [address, yourBalance]);
+
+  const mintItem = async () => {
+    try {
+      tx(writeContracts && writeContracts.WolfSheepNFT && writeContracts.WolfSheepNFT.mintItem(address), update => {
+        console.log("📡 Transaction Update:", update);
+        if (update && (update.status === "confirmed" || update.status === 1)) {
+          console.log(" 🍾 Transaction " + update.hash + " finished!");
+          console.log(
+            " ⛽️ " +
+              update.gasUsed +
+              "/" +
+              (update.gasLimit || update.gas) +
+              " @ " +
+              parseFloat(update.gasPrice) / 1000000000 +
+              " gwei",
+          );
+        }
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
-    <div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>📝</span>
-        This Is Your App Home. You can start editing it in{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          packages/react-app/src/views/Home.jsx
-        </span>
+    <>
+      <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
+        <Button shape="round" size="large" onClick={mintItem}>
+          MINT NFT
+        </Button>
       </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🤓</span>
-        The "purpose" variable from our contract is{" "}
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          {purpose}
-        </span>
+      <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
+        <List
+          bordered
+          dataSource={yourCollectibles}
+          renderItem={item => {
+            const id = item.id.toNumber();
+            return (
+              <List.Item key={id + "_" + item.uri + "_" + item.owner}>
+                <Card>
+                  <div>
+                    <img src={item.isSheep ? "./img/sheep.png" : "./img/wolf.png"} />
+                  </div>
+                </Card>
+
+                <div>
+                  owner:{" "}
+                  <Address
+                    address={item.owner}
+                    ensProvider={mainnetProvider}
+                    blockExplorer={blockExplorer}
+                    fontSize={16}
+                  />
+                  <AddressInput
+                    ensProvider={mainnetProvider}
+                    placeholder="transfer to address"
+                    value={transferToAddresses[id]}
+                    onChange={newValue => {
+                      const update = {};
+                      update[id] = newValue;
+                      setTransferToAddresses({ ...transferToAddresses, ...update });
+                    }}
+                  />
+                  <Button
+                    onClick={() => {
+                      console.log("writeContracts", writeContracts);
+                      tx(writeContracts.WolfSheepNFT.transferFrom(address, transferToAddresses[id], id));
+                    }}
+                  >
+                    Transfer
+                  </Button>
+                </div>
+              </List.Item>
+            );
+          }}
+        />
       </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🤖</span>
-        An example prop of your balance{" "}
-        <span style={{ fontWeight: "bold", color: "green" }}>({ethers.utils.formatEther(yourLocalBalance)})</span> was
-        passed into the
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          Home.jsx
-        </span>{" "}
-        component from
-        <span
-          className="highlight"
-          style={{ marginLeft: 4, /* backgroundColor: "#f9f9f9", */ padding: 4, borderRadius: 4, fontWeight: "bolder" }}
-        >
-          App.jsx
-        </span>
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>💭</span>
-        Check out the <Link to="/hints">"Hints"</Link> tab for more tips.
-      </div>
-      <div style={{ margin: 32 }}>
-        <span style={{ marginRight: 8 }}>🛠</span>
-        Tinker with your smart contract using the <Link to="/debug">"Debug Contract"</Link> tab.
-      </div>
-    </div>
+    </>
   );
 }
 
