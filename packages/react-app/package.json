@@ -81,7 +81,10 @@
     "surge": "^0.21.5"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": ["react-app", "plugin:prettier/recommended"],
+    "rules": {
+      "prettier/prettier": "warn"
+    }
   },
   "scripts": {
     "build": "react-scripts build",
