@@ -39,7 +39,7 @@ export default function Faucet(props) {
   const [address, setAddress] = useState();
   const [faucetAddress, setFaucetAddress] = useState();
 
-  const { price, placeholder, localProvider, ensProvider, onChange } = props;
+  const { price, placeholder, localProvider, ensProvider } = props;
 
   useEffect(() => {
     const getFaucetAddress = async () => {
@@ -58,14 +58,11 @@ export default function Faucet(props) {
     blockie = <div />;
   }
 
-  const updateAddress = useCallback(
-    async newValue => {
-      if (typeof newValue !== "undefined" && utils.isAddress(newValue)) {
-        setAddress(newValue);
-      }
-    },
-    [ensProvider, onChange],
-  );
+  const updateAddress = useCallback(async newValue => {
+    if (typeof newValue !== "undefined" && utils.isAddress(newValue)) {
+      setAddress(newValue);
+    }
+  }, []);
 
   const tx = Transactor(localProvider);
 

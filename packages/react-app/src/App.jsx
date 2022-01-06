@@ -1,6 +1,6 @@
-import { Alert, Button, Col, Menu, Row } from "antd";
+import { Button, Col, Menu, Row } from "antd";
 import "antd/dist/antd.css";
-import { useBalance, useContractLoader, useContractReader, useGasPrice, useUserProviderAndSigner } from "eth-hooks";
+import { useBalance, useContractLoader, useGasPrice, useUserProviderAndSigner } from "eth-hooks";
 import { useExchangeEthPrice } from "eth-hooks/dapps/dex";
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, Route, Switch, useLocation } from "react-router-dom";
@@ -166,7 +166,6 @@ function App(props) {
     ) {
       console.log("_____________________________________ 🏗 scaffold-eth _____________________________________");
       console.log("🌎 mainnetProvider", mainnetProvider);
-      console.log("🏠 localChainId", localChainId);
       console.log("👩‍💼 selected address:", address);
       console.log("🕵🏻‍♂️ selectedChainId:", selectedChainId);
       console.log("💵 yourLocalBalance", yourLocalBalance ? ethers.utils.formatEther(yourLocalBalance) : "...");
@@ -205,6 +204,7 @@ function App(props) {
       console.log(code, reason);
       logoutOfWeb3Modal();
     });
+    // eslint-disable-next-line
   }, [setInjectedProvider]);
 
   useEffect(() => {

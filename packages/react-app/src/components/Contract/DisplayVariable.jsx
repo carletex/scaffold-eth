@@ -38,9 +38,7 @@ const DisplayVariable = ({ contractFunction, functionInfo, refreshRequired, trig
         </Col>
         <Col span={2}>
           <h2>
-            <a href="#" onClick={refresh}>
-              🔄
-            </a>
+            <button onClick={refresh}>🔄</button>
           </h2>
         </Col>
       </Row>

@@ -2,14 +2,7 @@ import { Alert, Button } from "antd";
 import React from "react";
 import { NETWORK } from "../constants";
 
-function NetworkDisplay({
-  NETWORKCHECK,
-  localChainId,
-  selectedChainId,
-  targetNetwork,
-  USE_NETWORK_SELECTOR,
-  logoutOfWeb3Modal,
-}) {
+function NetworkDisplay({ NETWORKCHECK, localChainId, selectedChainId, targetNetwork, USE_NETWORK_SELECTOR }) {
   let networkDisplay = "";
   if (NETWORKCHECK && localChainId && selectedChainId && localChainId !== selectedChainId) {
     const networkSelected = NETWORK(selectedChainId);
@@ -32,7 +25,6 @@ function NetworkDisplay({
         </div>
       );
     } else {
-      const showLogout = networkSelected && networkSelected.name !== "localhost";
       networkDisplay = (
         <div style={{ zIndex: 2, position: "absolute", right: 0, top: 60, padding: 16 }}>
           <Alert

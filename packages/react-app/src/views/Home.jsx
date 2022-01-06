@@ -26,7 +26,7 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
   const [transferToAddresses, setTransferToAddresses] = useState({});
 
   // keep track of a variable from the contract in the local React state:
-  const totalMinted = useContractReader(readContracts, "WolfSheepNFT", "totalMinted");
+  // const totalMinted = useContractReader(readContracts, "WolfSheepNFT", "totalMinted");
   const balance = useContractReader(readContracts, "WolfSheepNFT", "balanceOf", [address]);
 
   // keep track of a variable from the contract in the local React state:
@@ -57,7 +57,7 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
       setYourCollectibles(collectibleUpdate);
     };
     updateYourCollectibles();
-  }, [address, yourBalance]);
+  }, [address, yourBalance, balance, readContracts]);
 
   const mintItem = async () => {
     try {
@@ -99,7 +99,7 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
               <List.Item key={id + "_" + item.uri + "_" + item.owner}>
                 <Card>
                   <div>
-                    <img src={item.isSheep ? "./img/sheep.png" : "./img/wolf.png"} />
+                    <img alt="your NFT" src={item.isSheep ? "./img/sheep.png" : "./img/wolf.png"} />
                   </div>
                   <div>
                     owner:{" "}
