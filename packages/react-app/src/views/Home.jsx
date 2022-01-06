@@ -3,6 +3,8 @@ import { Button, Card, List } from "antd";
 import { useContractReader } from "eth-hooks";
 import { Address, AddressInput } from "../components";
 
+// ToDo. IPFS upload / bg color trait?
+
 /**
  * web3 props can be passed from '../App.jsx' into your local view component
  * for use
@@ -86,9 +88,10 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
           MINT NFT
         </Button>
       </div>
-      <div style={{ width: 640, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
+      <div style={{ width: 1200, margin: "auto", marginTop: 32, paddingBottom: 32 }}>
         <List
           bordered
+          grid={{ gutter: 4, column: 4 }}
           dataSource={yourCollectibles}
           renderItem={item => {
             const id = item.id.toNumber();
@@ -98,35 +101,34 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
                   <div>
                     <img src={item.isSheep ? "./img/sheep.png" : "./img/wolf.png"} />
                   </div>
+                  <div>
+                    owner:{" "}
+                    <Address
+                      address={item.owner}
+                      ensProvider={mainnetProvider}
+                      blockExplorer={blockExplorer}
+                      fontSize={16}
+                    />
+                    <AddressInput
+                      ensProvider={mainnetProvider}
+                      placeholder="transfer to address"
+                      value={transferToAddresses[id]}
+                      onChange={newValue => {
+                        const update = {};
+                        update[id] = newValue;
+                        setTransferToAddresses({ ...transferToAddresses, ...update });
+                      }}
+                    />
+                    <Button
+                      onClick={() => {
+                        console.log("writeContracts", writeContracts);
+                        tx(writeContracts.WolfSheepNFT.transferFrom(address, transferToAddresses[id], id));
+                      }}
+                    >
+                      Transfer
+                    </Button>
+                  </div>
                 </Card>
-
-                <div>
-                  owner:{" "}
-                  <Address
-                    address={item.owner}
-                    ensProvider={mainnetProvider}
-                    blockExplorer={blockExplorer}
-                    fontSize={16}
-                  />
-                  <AddressInput
-                    ensProvider={mainnetProvider}
-                    placeholder="transfer to address"
-                    value={transferToAddresses[id]}
-                    onChange={newValue => {
-                      const update = {};
-                      update[id] = newValue;
-                      setTransferToAddresses({ ...transferToAddresses, ...update });
-                    }}
-                  />
-                  <Button
-                    onClick={() => {
-                      console.log("writeContracts", writeContracts);
-                      tx(writeContracts.WolfSheepNFT.transferFrom(address, transferToAddresses[id], id));
-                    }}
-                  >
-                    Transfer
-                  </Button>
-                </div>
               </List.Item>
             );
           }}
