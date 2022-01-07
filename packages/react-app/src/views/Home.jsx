@@ -26,18 +26,18 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
   const [transferToAddresses, setTransferToAddresses] = useState({});
 
   // keep track of a variable from the contract in the local React state:
-  const totalMinted = useContractReader(readContracts, "WolfSheepNFT", "totalMinted");
+  // const totalMinted = useContractReader(readContracts, "WolfSheepNFT", "totalMinted");
   const balance = useContractReader(readContracts, "WolfSheepNFT", "balanceOf", [address]);
 
   // keep track of a variable from the contract in the local React state:
   console.log("🤗 balance:", balance);
 
   // 🧠 This effect will update yourCollectibles by polling when your balance changes
-  const yourBalance = balance && balance.toString && balance.toString();
   useEffect(() => {
     const updateYourCollectibles = async () => {
       const collectibleUpdate = [];
-      for (let tokenIndex = 0; tokenIndex < balance; tokenIndex++) {
+      const yourBalance = balance && balance.toString && balance.toString();
+      for (let tokenIndex = 0; tokenIndex < yourBalance; tokenIndex++) {
         try {
           console.log("Getting token index", tokenIndex);
           const tokenId = await readContracts.WolfSheepNFT.tokenOfOwnerByIndex(address, tokenIndex);
@@ -57,7 +57,7 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
       setYourCollectibles(collectibleUpdate);
     };
     updateYourCollectibles();
-  }, [address, yourBalance]);
+  }, [address, balance, readContracts]);
 
   const mintItem = async () => {
     try {
@@ -99,7 +99,7 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
               <List.Item key={id + "_" + item.uri + "_" + item.owner}>
                 <Card>
                   <div>
-                    <img src={item.isSheep ? "./img/sheep.png" : "./img/wolf.png"} />
+                    <img alt={`token ${item.id}`} src={item.isSheep ? "./img/sheep.png" : "./img/wolf.png"} />
                   </div>
                   <div>
                     owner:{" "}
