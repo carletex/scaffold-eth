@@ -44,14 +44,16 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
           console.log("tokenId", tokenId);
           const tokenTraits = await readContracts.WolfSheepNFT.getTokenTraits(tokenId);
           console.log("tokenTraits", tokenTraits);
-          const staking = await readContracts.WolfSheepStaking.barn(tokenId);
-          console.log("staking", staking);
+          const stakeSheeps = await readContracts.WolfSheepStaking.barn(tokenId);
+          console.log("stakeSheeps", stakeSheeps);
+          const stakeWolfIndex = await readContracts.WolfSheepStaking.packIndices(tokenId);
+          console.log("stakeWolfsIndex", stakeWolfIndex);
 
           collectibleUpdate.push({
             id: tokenId,
             owner: address,
             isSheep: tokenTraits.isSheep,
-            staked: !!staking.tokenId,
+            staked: tokenTraits.isSheep ? !!stakeSheeps.tokenId : !!stakeWolfIndex.toNumber(),
           });
         } catch (e) {
           console.log(e);
@@ -64,7 +66,7 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
 
   const mintItem = async () => {
     try {
-      tx(writeContracts && writeContracts.WolfSheepNFT && writeContracts.WolfSheepNFT.mintItem(address), update => {
+      tx(writeContracts && writeContracts.WolfSheepNFT && writeContracts.WolfSheepNFT.mintItem(), update => {
         console.log("📡 Transaction Update:", update);
         if (update && (update.status === "confirmed" || update.status === 1)) {
           console.log(" 🍾 Transaction " + update.hash + " finished!");
@@ -135,7 +137,9 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
                       onClick={() => {
                         console.log("Staking", id);
                         try {
-                          tx(writeContracts.WolfSheepStaking.addSheepToBarn(id));
+                          item.isSheep
+                            ? tx(writeContracts.WolfSheepStaking.addSheepToBarn(id))
+                            : tx(writeContracts.WolfSheepStaking.addWolfToPack(id));
                         } catch (e) {
                           console.log(e);
                         }

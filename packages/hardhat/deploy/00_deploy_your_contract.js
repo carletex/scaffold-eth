@@ -8,7 +8,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const { deployer } = await getNamedAccounts();
   const chainId = await getChainId();
 
-  const wsgse = await deploy("WolfSheepNFT", {
+  const deployedNft = await deploy("WolfSheepNFT", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
     args: [1000],
@@ -16,15 +16,17 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     waitConfirmations: 5,
   });
 
-  await deploy("WolfSheepStaking", {
+  const deployedStaking = await deploy("WolfSheepStaking", {
     from: deployer,
-    args: [wsgse.address],
+    args: [deployedNft.address],
     log: true,
     waitConfirmations: 5,
   });
 
+  const wolfSheepNFT = await ethers.getContract("WolfSheepNFT", deployer);
+  await wolfSheepNFT.setStakingContract(deployedStaking.address);
+
   // Getting a previously deployed contract
-  // const YourContract = await ethers.getContract("YourContract", deployer);
   /*  await YourContract.setPurpose("Hello");
 
     To take ownership of yourContract using the ownable library uncomment next line and add the
