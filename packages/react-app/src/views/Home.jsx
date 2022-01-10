@@ -44,11 +44,14 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
           console.log("tokenId", tokenId);
           const tokenTraits = await readContracts.WolfSheepNFT.getTokenTraits(tokenId);
           console.log("tokenTraits", tokenTraits);
+          const staking = await readContracts.WolfSheepStaking.barn(tokenId);
+          console.log("staking", staking);
 
           collectibleUpdate.push({
             id: tokenId,
             owner: address,
             isSheep: tokenTraits.isSheep,
+            staked: !!staking.tokenId,
           });
         } catch (e) {
           console.log(e);
@@ -121,11 +124,24 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
                     />
                     <Button
                       onClick={() => {
-                        console.log("writeContracts", writeContracts);
+                        console.log("Trasfering NFT", writeContracts);
                         tx(writeContracts.WolfSheepNFT.transferFrom(address, transferToAddresses[id], id));
                       }}
                     >
                       Transfer
+                    </Button>
+                    <Button
+                      disabled={item.staked}
+                      onClick={() => {
+                        console.log("Staking", id);
+                        try {
+                          tx(writeContracts.WolfSheepStaking.addSheepToBarn(address, id));
+                        } catch (e) {
+                          console.log(e);
+                        }
+                      }}
+                    >
+                      Stake
                     </Button>
                   </div>
                 </Card>

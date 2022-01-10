@@ -7,11 +7,11 @@ import "./WolfSheepNFT.sol";
 
 contract WolfSheepStaking is Ownable {
 
-    // Store a stake's owner, tokenId and earning values
+    // Store a stake's tokenId, earning values and owner.
     struct Stake {
-        address owner;
         uint16 tokenId;
         uint80 value;
+        address owner;
     }
 
     // reference to the WolfSheep NFT contract
@@ -34,7 +34,9 @@ contract WolfSheepStaking is Ownable {
      * @param account the address of the staker
      * @param tokenId the ID of the Sheep to add to the Barn
     */
-    function _addSheepToBarn(address account, uint256 tokenId) external {
+    function addSheepToBarn(address account, uint256 tokenId) external {
+        // ToDo. Only allow staking owned tokens.
+        // ToDo. Only allow to stake sheeps.
         barn[tokenId] = Stake({
             owner: account,
             tokenId: uint16(tokenId),
