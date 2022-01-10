@@ -130,21 +130,19 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
                     >
                       Transfer
                     </Button>
-                    {item.isSheep && (
-                      <Button
-                        disabled={item.staked}
-                        onClick={() => {
-                          console.log("Staking", id);
-                          try {
-                            tx(writeContracts.WolfSheepStaking.addSheepToBarn(id));
-                          } catch (e) {
-                            console.log(e);
-                          }
-                        }}
-                      >
-                        Stake
-                      </Button>
-                    )}
+                    <Button
+                      disabled={item.staked}
+                      onClick={() => {
+                        console.log("Staking", id);
+                        try {
+                          tx(writeContracts.WolfSheepStaking.addSheepToBarn(id));
+                        } catch (e) {
+                          console.log(e);
+                        }
+                      }}
+                    >
+                      Stake
+                    </Button>
                   </div>
                 </Card>
               </List.Item>

@@ -35,7 +35,6 @@ contract WolfSheepStaking is Ownable {
     */
     function addSheepToBarn(uint256 tokenId) external {
         require(wolfSheepNft.ownerOf(tokenId) == msg.sender, "Not your token");
-        require(isSheep(tokenId), "You can only stake Sheeps");
 
         barn[tokenId] = Stake({
             owner: msg.sender,
