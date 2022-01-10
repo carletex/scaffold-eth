@@ -31,14 +31,14 @@ contract WolfSheepStaking is Ownable {
 
     /**
      * adds a single Sheep to the Barn
-     * @param account the address of the staker
      * @param tokenId the ID of the Sheep to add to the Barn
     */
-    function addSheepToBarn(address account, uint256 tokenId) external {
-        // ToDo. Only allow staking owned tokens.
-        // ToDo. Only allow to stake sheeps.
+    function addSheepToBarn(uint256 tokenId) external {
+        require(wolfSheepNft.ownerOf(tokenId) == msg.sender, "Not your token");
+        require(isSheep(tokenId), "You can only stake Sheeps");
+
         barn[tokenId] = Stake({
-            owner: account,
+            owner: msg.sender,
             tokenId: uint16(tokenId),
             value: uint80(block.timestamp)
         });
@@ -46,6 +46,16 @@ contract WolfSheepStaking is Ownable {
         totalSheepStaked += 1;
     }
 
+    /** READ ONLY */
+
+    /**
+     * checks if a token is a Sheep
+     * @param tokenId the ID of the token to check
+     * @return sheep - whether or not a token is a Sheep
+     */
+    function isSheep(uint256 tokenId) public view returns (bool sheep) {
+        (sheep) = wolfSheepNft.tokenTraits(tokenId);
+    }
 
     /**
      * generates a pseudorandom number
