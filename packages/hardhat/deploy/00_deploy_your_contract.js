@@ -11,6 +11,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const wsgse = await deploy("WolfSheepNFT", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
+    args: [1000],
     log: true,
     waitConfirmations: 5,
   });

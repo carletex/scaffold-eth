@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 // ToDo. Base URI / IPFS
 // ToDo. Bg color trait?
 contract WolfSheepNFT is ERC721Enumerable, Ownable {
+    uint256 public immutable MAX_TOKENS;
 
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -24,7 +25,9 @@ contract WolfSheepNFT is ERC721Enumerable, Ownable {
     // mapping from tokenId to a struct containing the token's traits
     mapping(uint256 => WolfSheep) public tokenTraits;
 
-    constructor() ERC721("WolfSheep game: scaffold-eth", "WSGSE") { }
+    constructor(uint256 _maxTokens) ERC721("WolfSheep game: scaffold-eth", "WSGSE") {
+        MAX_TOKENS = _maxTokens;
+    }
 
     function _baseURI() internal pure override returns (string memory) {
         return "";
@@ -32,8 +35,10 @@ contract WolfSheepNFT is ERC721Enumerable, Ownable {
 
     function mintItem(address to) public returns (uint256) {
         _tokenIds.increment();
-
         uint256 id = _tokenIds.current();
+
+        require(id <= MAX_TOKENS, "All tokens minted");
+
         _mint(to, id);
 
         uint256 seed = random(id);
