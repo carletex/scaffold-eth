@@ -28,6 +28,10 @@ contract WolfSheepStaking is Ownable {
     // total of Wolves staked
     uint256 public totalWolfStaked;
 
+    // Daily token rewards
+    uint256 public constant DAILY_TOKEN_RATE = 86400;
+    // wolves tax % of claimed tokens
+    uint256 public constant TOKEN_CLAIM_TAX_PERCENTAGE = 20;
 
     /**
      * @param _wsgse reference to the WolfSheep NFT contract
@@ -96,6 +100,16 @@ contract WolfSheepStaking is Ownable {
     function randomWolfOwner(uint256 seed) external view returns (address) {
         if (totalWolfStaked == 0) return address(0x0);
         return pack[seed % pack.length].owner;
+    }
+
+    /**
+     * Stake a Wolf to the pack
+     * @param tokenId the ID of the Sheep to add to the Barn
+     */
+    function calculateRewards(uint256 tokenId) public view returns (uint256 reward) {
+        Stake memory stake = barn[tokenId];
+        reward = (block.timestamp - stake.value) * DAILY_TOKEN_RATE / 1 days;
+        return reward;
     }
 
     /**
