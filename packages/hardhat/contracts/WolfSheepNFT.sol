@@ -57,8 +57,7 @@ contract WolfSheepNFT is ERC721Enumerable, Ownable {
         return id;
     }
 
-    // ToDo. Permissions.
-    function setStakingContract(address _wsstaking) public {
+    function setStakingContract(address _wsstaking) public onlyOwner {
         wolfSheepStaking = WolfSheepStaking(_wsstaking);
     }
 
