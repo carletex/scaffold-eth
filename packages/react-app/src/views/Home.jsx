@@ -49,11 +49,18 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
           const stakeWolfIndex = await readContracts.WolfSheepStaking.packIndices(tokenId);
           console.log("stakeWolfsIndex", stakeWolfIndex);
 
+          // ToDo. Recalculate onBlock (or contract Reader)
+          let rewards;
+          if (!!stakeSheeps.tokenId) {
+            rewards = await readContracts.WolfSheepStaking.calculateRewards(tokenId);
+          }
+
           collectibleUpdate.push({
             id: tokenId,
             owner: address,
             isSheep: tokenTraits.isSheep,
             staked: tokenTraits.isSheep ? !!stakeSheeps.tokenId : !!stakeWolfIndex.toNumber(),
+            rewards: rewards?.toString(),
           });
         } catch (e) {
           console.log(e);
@@ -147,6 +154,14 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
                     >
                       Stake
                     </Button>
+                    {item.staked && (
+                      <>
+                        <h3>
+                          <strong>Stacked</strong>
+                        </h3>
+                        <p>Unclaimed TOKEN rewards: {item.rewards}</p>
+                      </>
+                    )}
                   </div>
                 </Card>
               </List.Item>

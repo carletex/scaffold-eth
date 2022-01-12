@@ -103,10 +103,11 @@ contract WolfSheepStaking is Ownable {
     }
 
     /**
-     * Stake a Wolf to the pack
+     * The rewards gained by sheep staking
      * @param tokenId the ID of the Sheep to add to the Barn
      */
     function calculateRewards(uint256 tokenId) public view returns (uint256 reward) {
+        require(isSheep(tokenId), "Not a sheep");
         Stake memory stake = barn[tokenId];
         reward = (block.timestamp - stake.value) * DAILY_TOKEN_RATE / 1 days;
         return reward;
