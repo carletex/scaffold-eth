@@ -8,6 +8,13 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const { deployer } = await getNamedAccounts();
   const chainId = await getChainId();
 
+  const deployedERC20Token = await deploy("WolfSheepERC20Token", {
+    // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
+    from: deployer,
+    log: true,
+    waitConfirmations: 5,
+  });
+
   const deployedNft = await deploy("WolfSheepNFT", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
@@ -18,13 +25,19 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   const deployedStaking = await deploy("WolfSheepStaking", {
     from: deployer,
-    args: [deployedNft.address],
+    args: [deployedNft.address, deployedERC20Token.address],
     log: true,
     waitConfirmations: 5,
   });
 
   const wolfSheepNFT = await ethers.getContract("WolfSheepNFT", deployer);
   await wolfSheepNFT.setStakingContract(deployedStaking.address);
+
+  const wolfSheepERC20Token = await ethers.getContract(
+    "WolfSheepERC20Token",
+    deployer
+  );
+  await wolfSheepERC20Token.addAddressToAllowList(deployedStaking.address);
 
   // Getting a previously deployed contract
   /*  await YourContract.setPurpose("Hello");

@@ -160,6 +160,21 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
                           <strong>Stacked</strong>
                         </h3>
                         <p>Unclaimed TOKEN rewards: {item.rewards}</p>
+                        <p>
+                          <Button
+                            disabled={!item.staked}
+                            onClick={() => {
+                              console.log("Claim rewards", id);
+                              try {
+                                tx(writeContracts.WolfSheepStaking.claimWoolFromSheep(id, false));
+                              } catch (e) {
+                                console.log(e);
+                              }
+                            }}
+                          >
+                            Claim rewards
+                          </Button>
+                        </p>
                       </>
                     )}
                   </div>
