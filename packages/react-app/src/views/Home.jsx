@@ -52,7 +52,9 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
           // ToDo. Recalculate onBlock (or contract Reader)
           let rewards;
           if (!!stakeSheeps.tokenId) {
-            rewards = await readContracts.WolfSheepStaking.calculateRewards(tokenId);
+            rewards = await readContracts.WolfSheepStaking.calculateSheepRewards(tokenId);
+          } else if (!!stakeWolfIndex.toNumber()) {
+            rewards = await readContracts.WolfSheepStaking.calculateWolfRewards(tokenId);
           }
 
           collectibleUpdate.push({
@@ -166,7 +168,9 @@ function Home({ yourLocalBalance, readContracts, writeContracts, address, tx, ma
                             onClick={() => {
                               console.log("Claim rewards", id);
                               try {
-                                tx(writeContracts.WolfSheepStaking.claimWoolFromSheep(id, false));
+                                item.isSheep
+                                  ? tx(writeContracts.WolfSheepStaking.claimWoolFromSheep(id, false))
+                                  : tx(writeContracts.WolfSheepStaking.claimWoolFromWolf(id, false));
                               } catch (e) {
                                 console.log(e);
                               }

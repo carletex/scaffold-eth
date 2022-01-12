@@ -32,6 +32,8 @@ contract WolfSheepStaking is Ownable {
     uint256 public totalWolvesStaked;
     // Save rewards when no wolves are staked
     uint256 public unaccountedRewards = 0;
+    // amount of $WOOL due for each wolf
+    uint256 public woolPerWolf = 0;
 
     // Daily token rewards
     uint256 public constant DAILY_WOOL_RATE = 86400;
@@ -81,7 +83,7 @@ contract WolfSheepStaking is Ownable {
         pack.push(Stake({
             owner: msg.sender,
             tokenId: uint16(tokenId),
-            value: uint80(block.timestamp)
+            value: uint80(woolPerWolf)
         }));
 
         totalWolvesStaked += 1;
@@ -100,7 +102,7 @@ contract WolfSheepStaking is Ownable {
         require(isSheep(tokenId), "Not a sheep");
 
         // ToDo. End rewards at some point
-        uint256 owed = calculateRewards(tokenId);
+        uint256 owed = calculateSheepRewards(tokenId);
 
         if (unstake) {
             // 50% chance of all $WOOL stolen
@@ -129,6 +131,33 @@ contract WolfSheepStaking is Ownable {
     }
 
     /**
+     * get $WOOL rewards for a single Wolf and optionally unstake it
+     * @param tokenId the ID of the Wolf
+     * @param unstake whether or not to unstake the Wolf
+     */
+    function claimWoolFromWolf(uint256 tokenId, bool unstake) external {
+        Stake memory stake = barn[tokenId];
+        require(wolfSheepNft.ownerOf(tokenId) == msg.sender, "Not your token");
+        require(!isSheep(tokenId), "Not a wolf");
+
+        // ToDo. End rewards at some point
+        uint256 owed = calculateWolfRewards(tokenId);
+
+        if (unstake) {
+            // ToDo.
+        } else {
+            // reset stake
+            pack[packIndices[tokenId]] = Stake({
+                owner: msg.sender,
+                tokenId: uint16(tokenId),
+                value: uint80(woolPerWolf)
+            });
+        }
+
+        wolfSheepERC20Token.mint(msg.sender, owed);
+    }
+
+    /**
      * add $WOOL to claimable pot for the Pack of Wolves
      * @param amount $WOOL to add to the pot
      */
@@ -140,8 +169,8 @@ contract WolfSheepStaking is Ownable {
         }
 
         // Include any unaccounted $WOOL
-        // woolPerWolf += (amount + unaccountedRewards) / totalWolvesStaked;
-        // unaccountedRewards = 0;
+         woolPerWolf += (amount + unaccountedRewards) / totalWolvesStaked;
+         unaccountedRewards = 0;
     }
 
     /** READ ONLY */
@@ -169,9 +198,19 @@ contract WolfSheepStaking is Ownable {
      * The rewards gained by sheep staking
      * @param tokenId the ID of the Sheep to add to the Barn
      */
-    function calculateRewards(uint256 tokenId) public view returns (uint256 reward) {
+    function calculateSheepRewards(uint256 tokenId) public view returns (uint256 reward) {
         Stake memory stake = barn[tokenId];
         reward = (block.timestamp - stake.value) * DAILY_WOOL_RATE / 1 days;
+        return reward;
+    }
+
+    /**
+     * The rewards gained by wolf staking
+     * @param tokenId the ID of the Sheep to add to the Barn
+     */
+    function calculateWolfRewards(uint256 tokenId) public view returns (uint256 reward) {
+        Stake memory stake = pack[packIndices[tokenId]];
+        reward = woolPerWolf - stake.value;
         return reward;
     }
 
