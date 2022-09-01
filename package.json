@@ -77,7 +77,7 @@
     "packages/react-app/src/**/*.{js,jsx}": [
       "prettier --write",
       "eslint --fix",
-      "eslint --max-warnings=0 --ignore-path packages/react-app/.eslintignore"
+      "eslint --ignore-path packages/react-app/.eslintignore"
     ]
   }
 }
