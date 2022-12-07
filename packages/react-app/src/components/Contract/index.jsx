@@ -1,11 +1,11 @@
-import { Button, Card } from "antd";
+import { Card } from "antd";
 import { useContractExistsAtAddress, useContractLoader } from "eth-hooks";
 import React, { useMemo, useState } from "react";
 import Address from "../Address";
 import Balance from "../Balance";
 import DisplayVariable from "./DisplayVariable";
 import FunctionForm from "./FunctionForm";
-import { Transactor } from "../../helpers";
+import RawCalldataForm from "./RawCalldataForm";
 
 const noContractDisplay = (
   <div>
@@ -115,9 +115,6 @@ export default function Contract({
     return null;
   });
 
-  const tx = Transactor(provider, gasPrice);
-  const [rawCalldataValue, setRawCalldataValue] = useState("");
-
   return (
     <div style={{ margin: "auto", width: "70vw" }}>
       <Card
@@ -137,32 +134,7 @@ export default function Contract({
         {contractIsDeployed ? contractDisplay : noContractDisplay}
       </Card>
       <Card style={{ marginTop: "20px" }} title="Raw Calldata">
-        <textarea
-          style={{ display: "block", margin: "0 auto 20px" }}
-          cols="50"
-          rows="10"
-          value={rawCalldataValue}
-          onChange={e => setRawCalldataValue(e.target.value)}
-        />
-        <Button
-          type="primary"
-          onClick={async () => {
-            // ToDo. Check "0x"
-            // ToDo. Validate data
-            const signer = provider.getSigner();
-            await tx(
-              signer.sendTransaction({
-                to: address,
-                data: rawCalldataValue,
-              }),
-            );
-            // const result =
-            triggerRefresh(true);
-            // console.log("sendingRawTx", result);
-          }}
-        >
-          Send Raw tx
-        </Button>
+        <RawCalldataForm address={address} provider={provider} gasPrice={gasPrice} triggerRefresh={triggerRefresh} />
       </Card>
     </div>
   );

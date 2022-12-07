@@ -7,21 +7,26 @@ import "hardhat/console.sol";
 
 contract YourContract {
 
-  event SetPurpose(address sender, string purpose);
+    event SetPurpose(address sender, string purpose);
 
-  string public purpose = "Building Unstoppable Apps!!!";
+    string public purpose = "Building Unstoppable Apps!!!";
+    uint public number = 0;
 
-  constructor() payable {
+    constructor() payable {
     // what should we do on deploy?
-  }
+    }
 
-  function setPurpose(string memory newPurpose) public payable {
+    function setPurpose(string memory newPurpose) public payable {
       purpose = newPurpose;
       console.log(msg.sender,"set purpose to",purpose);
       emit SetPurpose(msg.sender, purpose);
-  }
+    }
 
-  // to support receiving ETH by default
-  receive() external payable {}
-  fallback() external payable {}
-}
+    function setNumber(uint newNumber) public {
+        number = newNumber;
+    }
+
+    // to support receiving ETH by default
+    receive() external payable {}
+    fallback() external payable {}
+    }
