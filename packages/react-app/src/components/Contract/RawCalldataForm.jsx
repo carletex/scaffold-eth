@@ -5,10 +5,23 @@ import { utils } from "ethers";
 const { Panel } = Collapse;
 const { Text, Paragraph } = Typography;
 
+const isNumeric = input => {
+  return !isNaN(input) && !isNaN(parseFloat(input));
+};
+
+const stringToHex = input => {
+  if (isNumeric(input)) {
+    return utils.hexStripZeros(utils.hexlify(Number(input))).slice(2);
+  }
+
+  return utils.hexStripZeros(utils.hexlify(utils.toUtf8Bytes(input))).slice(2);
+};
+
 export default function RawCalldataForm({ address, provider, gasPrice, triggerRefresh }) {
   const tx = Transactor(provider, gasPrice);
   const [rawCalldataValue, setRawCalldataValue] = useState("");
   const [keccak256String, setKeccak256String] = useState("");
+  const [paddingString, setPaddingString] = useState("");
 
   const sendRawCalldataToContract = async () => {
     if (!utils.isHexString(rawCalldataValue)) {
@@ -33,16 +46,34 @@ export default function RawCalldataForm({ address, provider, gasPrice, triggerRe
     <>
       <Collapse style={{ margin: "0 auto 20px", maxWidth: "500px" }}>
         <Panel header={<strong>Utils</strong>} key="1" style={{ textAlign: "left" }}>
-          <strong>Keccak-256</strong> <Text type="secondary">(Function signature => 4 Byte Hash)</Text>
-          <Input
-            placeholder="function signature"
-            onChange={e => {
-              setKeccak256String(e.target.value);
-            }}
-          />
-          <Paragraph style={{ marginTop: "5px" }} copyable>
-            {keccak256String && utils.keccak256(utils.toUtf8Bytes(keccak256String)).slice(0, 7)}
-          </Paragraph>
+          <div style={{ marginBottom: "25px" }}>
+            <strong>Keccak-256</strong> <Text type="secondary">(Function signature => 4 Bytes Hash)</Text>
+            <Input
+              placeholder="function signature"
+              onChange={e => {
+                setKeccak256String(e.target.value);
+              }}
+            />
+            <Paragraph style={{ marginTop: "5px" }} copyable>
+              {keccak256String && utils.keccak256(utils.toUtf8Bytes(keccak256String)).slice(0, 10)}
+            </Paragraph>
+          </div>
+
+          <div style={{ marginBottom: "25px" }}>
+            <strong>Hex & Padding</strong> <Text type="secondary">(Convert input to hex and pad it to 32 Bytes)</Text>
+            <Input
+              placeholder="Value to pad"
+              onChange={e => {
+                setPaddingString(e.target.value);
+              }}
+            />
+            <Paragraph style={{ marginTop: "5px" }} copyable>
+              {paddingString && stringToHex(paddingString).padStart(64, "0")}
+            </Paragraph>
+            <Paragraph style={{ marginTop: "5px" }} copyable>
+              {paddingString && stringToHex(paddingString).padEnd(64, "0")}
+            </Paragraph>
+          </div>
         </Panel>
       </Collapse>
       <textarea
