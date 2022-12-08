@@ -133,7 +133,11 @@ export default function Contract({
       >
         {contractIsDeployed ? contractDisplay : noContractDisplay}
       </Card>
-      <Card style={{ marginTop: "20px" }} title="Raw Calldata">
+      <Card
+        style={{ marginTop: "20px" }}
+        headStyle={{ backgroundColor: "#e8eeff" }}
+        title={<strong>Raw Calldata</strong>}
+      >
         <RawCalldataForm address={address} provider={provider} gasPrice={gasPrice} triggerRefresh={triggerRefresh} />
       </Card>
     </div>
