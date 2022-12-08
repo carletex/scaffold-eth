@@ -77,8 +77,8 @@ export default function RawCalldataForm({ address, provider, gasPrice, triggerRe
         </Panel>
       </Collapse>
       <textarea
-        style={{ display: "block", margin: "0 auto 20px" }}
-        cols="50"
+        style={{ display: "block", margin: "0 auto 20px", fontFamily: "monospace" }}
+        cols="60"
         rows="10"
         value={rawCalldataValue}
         onChange={e => setRawCalldataValue(e.target.value)}
