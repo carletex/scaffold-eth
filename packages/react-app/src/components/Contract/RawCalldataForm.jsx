@@ -24,7 +24,8 @@ export default function RawCalldataForm({ address, provider, gasPrice, triggerRe
   const [paddingString, setPaddingString] = useState("");
 
   const sendRawCalldataToContract = async () => {
-    if (!utils.isHexString(rawCalldataValue)) {
+    const rawString = rawCalldataValue.replace(/(\r\n|\n|\r)/gm, "");
+    if (!utils.isHexString(rawString)) {
       notification.error({
         message: "Raw calldata should be an Hex string (Starting with '0x')",
       });
@@ -35,7 +36,7 @@ export default function RawCalldataForm({ address, provider, gasPrice, triggerRe
     await tx(
       signer.sendTransaction({
         to: address,
-        data: rawCalldataValue,
+        data: rawString,
       }),
     );
 
@@ -44,7 +45,7 @@ export default function RawCalldataForm({ address, provider, gasPrice, triggerRe
 
   return (
     <>
-      <Collapse style={{ margin: "0 auto 20px", maxWidth: "500px" }}>
+      <Collapse style={{ margin: "0 auto 20px", maxWidth: "560px" }}>
         <Panel header={<strong>Utils</strong>} key="1" style={{ textAlign: "left" }}>
           <div style={{ marginBottom: "25px" }}>
             <strong>Keccak-256</strong> <Text type="secondary">(Function signature => 4 Bytes Hash)</Text>
@@ -54,7 +55,7 @@ export default function RawCalldataForm({ address, provider, gasPrice, triggerRe
                 setKeccak256String(e.target.value);
               }}
             />
-            <Paragraph style={{ marginTop: "5px" }} copyable>
+            <Paragraph style={{ marginTop: "5px", minHeight: "22px" }} copyable={!!keccak256String}>
               {keccak256String && utils.keccak256(utils.toUtf8Bytes(keccak256String)).slice(0, 10)}
             </Paragraph>
           </div>
@@ -67,10 +68,10 @@ export default function RawCalldataForm({ address, provider, gasPrice, triggerRe
                 setPaddingString(e.target.value);
               }}
             />
-            <Paragraph style={{ marginTop: "5px" }} copyable>
+            <Paragraph style={{ marginTop: "5px" }} copyable={!!paddingString}>
               {paddingString && stringToHex(paddingString).padStart(64, "0")}
             </Paragraph>
-            <Paragraph style={{ marginTop: "5px" }} copyable>
+            <Paragraph style={{ marginTop: "5px" }} copyable={!!paddingString}>
               {paddingString && stringToHex(paddingString).padEnd(64, "0")}
             </Paragraph>
           </div>
