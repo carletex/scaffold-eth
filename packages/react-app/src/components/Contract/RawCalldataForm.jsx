@@ -1,5 +1,5 @@
 import { Button, Collapse, Input, notification, Typography } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Transactor } from "../../helpers";
 import { utils } from "ethers";
 const { Panel } = Collapse;
@@ -17,11 +17,24 @@ const stringToHex = input => {
   return utils.hexStripZeros(utils.hexlify(utils.toUtf8Bytes(input))).slice(2);
 };
 
-export default function RawCalldataForm({ address, provider, gasPrice, triggerRefresh }) {
+export default function RawCalldataForm({ address, provider, gasPrice, triggerRefresh, txResult }) {
   const tx = Transactor(provider, gasPrice);
   const [rawCalldataValue, setRawCalldataValue] = useState("");
   const [keccak256String, setKeccak256String] = useState("");
   const [paddingString, setPaddingString] = useState("");
+
+  useEffect(() => {
+    let objResponse;
+    try {
+      objResponse = JSON.parse(txResult);
+    } catch (e) {
+      return;
+    }
+
+    if (objResponse?.data) {
+      setRawCalldataValue(objResponse?.data);
+    }
+  }, [txResult]);
 
   const sendRawCalldataToContract = async () => {
     const rawString = rawCalldataValue.replace(/(\r\n|\n|\r)/gm, "");
@@ -50,6 +63,7 @@ export default function RawCalldataForm({ address, provider, gasPrice, triggerRe
           <div style={{ marginBottom: "25px" }}>
             <strong>Keccak-256</strong> <Text type="secondary">(Function signature => 4 Bytes Hash)</Text>
             <Input
+              spellCheck="false"
               placeholder="function signature"
               onChange={e => {
                 setKeccak256String(e.target.value);
@@ -63,6 +77,7 @@ export default function RawCalldataForm({ address, provider, gasPrice, triggerRe
           <div style={{ marginBottom: "25px" }}>
             <strong>Hex & Padding</strong> <Text type="secondary">(Convert input to hex and pad it to 32 Bytes)</Text>
             <Input
+              spellCheck="false"
               placeholder="Value to pad"
               onChange={e => {
                 setPaddingString(e.target.value);
@@ -79,6 +94,7 @@ export default function RawCalldataForm({ address, provider, gasPrice, triggerRe
       </Collapse>
       <textarea
         style={{ display: "block", margin: "0 auto 20px", fontFamily: "monospace" }}
+        spellCheck="false"
         cols="60"
         rows="10"
         value={rawCalldataValue}

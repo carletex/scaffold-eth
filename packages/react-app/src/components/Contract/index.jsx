@@ -79,6 +79,8 @@ export default function Contract({
   }, [contract, show]);
 
   const [refreshRequired, triggerRefresh] = useState(false);
+  const [txResult, setTxResult] = useState({});
+
   const contractDisplay = displayedContractFunctions.map(contractFuncInfo => {
     const contractFunc =
       contractFuncInfo[1].stateMutability === "view" || contractFuncInfo[1].stateMutability === "pure"
@@ -109,6 +111,7 @@ export default function Contract({
           provider={provider}
           gasPrice={gasPrice}
           triggerRefresh={triggerRefresh}
+          setTxResult={setTxResult}
         />
       );
     }
@@ -138,7 +141,13 @@ export default function Contract({
         headStyle={{ backgroundColor: "#e8eeff" }}
         title={<strong>Raw Calldata</strong>}
       >
-        <RawCalldataForm address={address} provider={provider} gasPrice={gasPrice} triggerRefresh={triggerRefresh} />
+        <RawCalldataForm
+          address={address}
+          provider={provider}
+          gasPrice={gasPrice}
+          triggerRefresh={triggerRefresh}
+          txResult={txResult}
+        />
       </Card>
     </div>
   );

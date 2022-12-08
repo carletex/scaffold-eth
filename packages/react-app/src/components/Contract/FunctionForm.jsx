@@ -14,7 +14,14 @@ const getFunctionInputKey = (functionInfo, input, inputIndex) => {
 
 const isReadable = fn => fn.stateMutability === "view" || fn.stateMutability === "pure";
 
-export default function FunctionForm({ contractFunction, functionInfo, provider, gasPrice, triggerRefresh }) {
+export default function FunctionForm({
+  contractFunction,
+  functionInfo,
+  provider,
+  gasPrice,
+  triggerRefresh,
+  setTxResult,
+}) {
   const [form, setForm] = useState({});
   const [txValue, setTxValue] = useState();
   const [returnValue, setReturnValue] = useState();
@@ -229,6 +236,7 @@ export default function FunctionForm({ contractFunction, functionInfo, provider,
 
               console.log("SETTING RESULT:", result);
               setReturnValue(result);
+              setTxResult(result);
               triggerRefresh(true);
             }}
           >
