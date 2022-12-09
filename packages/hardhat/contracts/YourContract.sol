@@ -16,13 +16,13 @@ contract YourContract {
     // what should we do on deploy?
     }
 
-    function setPurpose(string memory newPurpose) public payable {
+    function setPurpose(string memory newPurpose) public {
       purpose = newPurpose;
       console.log(msg.sender,"set purpose to",purpose);
       emit SetPurpose(msg.sender, purpose);
     }
 
-    function setNumber(uint newNumber) public {
+    function setNumber(uint256 newNumber) public {
         number = newNumber;
     }
 
